@@ -103,6 +103,18 @@ export const AlertsPanel = () => {
     return () => window.removeEventListener('newAlert', handleNewAlert as EventListener);
   }, []);
 
+  const deleteAlert = (alertId: number) => {
+    setAlerts(prev => prev.filter(alert => alert.id !== alertId));
+    
+    // Also remove from localStorage if it exists there
+    const savedAlerts = localStorage.getItem('toweriq-alerts');
+    if (savedAlerts) {
+      const parsedAlerts = JSON.parse(savedAlerts);
+      const updatedAlerts = parsedAlerts.filter((alert: any) => alert.id !== alertId);
+      localStorage.setItem('toweriq-alerts', JSON.stringify(updatedAlerts));
+    }
+  };
+
   const getSeverityColor = (severity: string) => {
     switch (severity) {
       case 'critical': return 'text-destructive';
@@ -163,7 +175,12 @@ export const AlertsPanel = () => {
                   {alert.title}
                 </h4>
               </div>
-              <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="h-6 w-6 p-0 hover:bg-destructive/20"
+                onClick={() => deleteAlert(alert.id)}
+              >
                 <X className="h-3 w-3" />
               </Button>
             </div>
