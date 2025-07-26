@@ -69,22 +69,39 @@ const CollisionDetection = () => {
     setLoading(true);
 
     try {
+      // Flatten the payload with top-level keys
+      const payload = {
+        lat1: aircraft1.latitude,
+        lon1: aircraft1.longitude,
+        alt1: aircraft1.altitude,
+        speed1: aircraft1.speed,
+        heading1: aircraft1.heading,
+        lat2: aircraft2.latitude,
+        lon2: aircraft2.longitude,
+        alt2: aircraft2.altitude,
+        speed2: aircraft2.speed,
+        heading2: aircraft2.heading
+      };
+
+      console.log('🔵 Sending payload:', payload);
+
       const response = await fetch('https://toweriq-1.onrender.com/predict', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          aircraft1,
-          aircraft2
-        }),
+        body: JSON.stringify(payload),
       });
 
+      console.log('🔴 Status:', response.status);
+      const text = await response.text();
+      console.log('🟢 Raw response:', text);
+
       if (!response.ok) {
-        throw new Error('Prediction API request failed');
+        throw new Error(text);
       }
 
-      const data: PredictionResponse = await response.json();
+      const data: PredictionResponse = JSON.parse(text);
       
       // Translate Arabic responses to English
       const translatedProbability = await translateArabicToEnglish(data.collision_probability);
