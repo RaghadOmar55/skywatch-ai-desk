@@ -1,11 +1,12 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { AlertTriangle, Plane } from 'lucide-react';
+import { AlertTriangle, Plane, ArrowLeft } from 'lucide-react';
 
 interface AircraftData {
   latitude: number;
@@ -21,6 +22,7 @@ interface PredictionResponse {
 }
 
 const CollisionDetection = () => {
+  const navigate = useNavigate();
   const [aircraft1, setAircraft1] = useState<AircraftData>({
     latitude: 24.774265,
     longitude: 46.738586,
@@ -156,7 +158,19 @@ const CollisionDetection = () => {
         <Header aiAssistantEnabled={true} />
         
         <div className="mb-6">
-          <h2 className="text-2xl font-bold text-center mb-8">نموذج التنبؤ بالتصادم</h2>
+          <div className="flex items-center justify-between mb-8">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate('/')}
+              className="flex items-center gap-2"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back to Home
+            </Button>
+            <h2 className="text-2xl font-bold">Collision Detection Model</h2>
+            <div></div>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -295,7 +309,7 @@ const CollisionDetection = () => {
                   disabled={loading}
                   className="w-full bg-warning text-warning-foreground hover:bg-warning/90"
                 >
-                  {loading ? 'Analyzing...' : 'تنبؤ التصادم'}
+                  {loading ? 'Analyzing...' : 'Predict Collision'}
                 </Button>
               </form>
             </CardContent>
@@ -324,7 +338,7 @@ const CollisionDetection = () => {
               ) : (
                 <div className="text-center text-muted-foreground py-8">
                   <AlertTriangle className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p>Enter aircraft data and click "تنبؤ التصادم" to get collision prediction</p>
+                  <p>Enter aircraft data and click "Predict Collision" to get collision prediction</p>
                 </div>
               )}
             </CardContent>
