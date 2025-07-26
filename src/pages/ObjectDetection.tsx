@@ -2,6 +2,7 @@ import { Header } from '@/components/Header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Search, Camera, Upload } from 'lucide-react';
+import RunwayDetection from '@/components/RunwayDetection';
 
 const ObjectDetection = () => {
   return (
@@ -13,13 +14,16 @@ const ObjectDetection = () => {
           <h2 className="text-2xl font-bold text-center mb-8">Object Detection</h2>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Runway Detection Component */}
+        <RunwayDetection />
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
           {/* Input Panel */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Camera className="h-5 w-5 text-warning" />
-                Object Detection Input
+                General Object Detection
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -27,9 +31,9 @@ const ObjectDetection = () => {
                 <div className="border-2 border-dashed border-border rounded-lg p-8 text-center">
                   <Upload className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
                   <p className="text-muted-foreground mb-4">
-                    Upload image or video for object detection analysis
+                    Upload image or video for general object detection
                   </p>
-                  <Button variant="outline" className="mb-2">
+                  <Button variant="outline" className="mb-2" disabled>
                     <Upload className="h-4 w-4 mr-2" />
                     Upload File
                   </Button>
@@ -49,12 +53,13 @@ const ObjectDetection = () => {
                         max="100" 
                         defaultValue="70"
                         className="w-full"
+                        disabled
                       />
                       <span className="text-xs text-muted-foreground">70%</span>
                     </div>
                     <div>
                       <label className="block text-sm font-medium mb-2">Detection Type</label>
-                      <select className="w-full p-2 rounded border border-border bg-background">
+                      <select className="w-full p-2 rounded border border-border bg-background" disabled>
                         <option>All Objects</option>
                         <option>Aircraft</option>
                         <option>Vehicles</option>
@@ -70,7 +75,7 @@ const ObjectDetection = () => {
                   disabled
                 >
                   <Search className="h-4 w-4 mr-2" />
-                  Analyze Objects
+                  Coming Soon
                 </Button>
               </div>
             </CardContent>
@@ -81,18 +86,17 @@ const ObjectDetection = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Search className="h-5 w-5 text-primary" />
-                Detection Results
+                General Detection Results
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-center text-muted-foreground py-8">
                 <Camera className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p className="mb-4">Object detection model integration coming soon</p>
+                <p className="mb-4">General object detection coming soon</p>
                 <div className="text-left space-y-2 max-w-md mx-auto">
                   <h4 className="font-semibold text-foreground">Planned Features:</h4>
                   <ul className="text-sm space-y-1">
                     <li>• Real-time aircraft detection</li>
-                    <li>• Runway object identification</li>
                     <li>• Foreign object debris (FOD) detection</li>
                     <li>• Vehicle tracking on tarmac</li>
                     <li>• Personnel safety monitoring</li>
