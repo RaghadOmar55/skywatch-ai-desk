@@ -75,6 +75,15 @@ export const AirspaceMap = () => {
           <div className="absolute top-[45%] left-[55%] w-20 h-20 border-2 border-warning rounded-full opacity-60 animate-pulse"></div>
           <div className="absolute top-[25%] left-[75%] w-16 h-16 border-2 border-destructive rounded-full opacity-60 animate-pulse"></div>
 
+          {/* Rotating Radar Sweep */}
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute top-1/2 left-1/2 w-full h-full transform -translate-x-1/2 -translate-y-1/2">
+              <div className="absolute top-1/2 left-1/2 w-0 h-0 transform -translate-x-1/2 -translate-y-1/2">
+                <div className="absolute w-96 h-0.5 bg-gradient-to-r from-primary/80 via-primary/40 to-transparent animate-spin origin-left duration-[4s] linear"></div>
+              </div>
+            </div>
+          </div>
+
           {/* Range rings */}
           <div className="absolute inset-0 pointer-events-none">
             <div className="absolute top-1/2 left-1/2 w-32 h-32 border border-muted-foreground/20 rounded-full transform -translate-x-1/2 -translate-y-1/2"></div>

@@ -52,6 +52,9 @@ All colors MUST be HSL.
     
     /* Animation variables */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* Radar animations */
+    --radar-sweep: rotate 4s linear infinite;
 
     --sidebar-background: 0 0% 98%;
 

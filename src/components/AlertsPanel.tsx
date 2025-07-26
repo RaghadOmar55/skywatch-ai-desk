@@ -2,9 +2,23 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { AlertTriangle, X, Clock, MapPin } from 'lucide-react';
+import { useState, useEffect } from 'react';
+
+interface Alert {
+  id: number;
+  type: string;
+  severity: string;
+  title: string;
+  description: string;
+  time: string;
+  location: string;
+  action: string;
+  message?: string;
+  timestamp?: string;
+}
 
 export const AlertsPanel = () => {
-  const alerts = [
+  const [alerts, setAlerts] = useState<Alert[]>([
     {
       id: 1,
       type: 'collision',
@@ -45,7 +59,49 @@ export const AlertsPanel = () => {
       location: 'Sector 12',
       action: 'Maintain visual separation'
     }
-  ];
+  ]);
+
+  // Listen for new alerts from other pages
+  useEffect(() => {
+    const handleNewAlert = (event: CustomEvent) => {
+      const newAlert = event.detail;
+      setAlerts(prev => [
+        {
+          id: newAlert.id,
+          type: newAlert.type,
+          severity: newAlert.severity,
+          title: newAlert.type === 'collision' ? 'Collision Alert' : 'System Alert',
+          description: newAlert.message,
+          time: 'Just now',
+          location: 'AI Prediction',
+          action: newAlert.message
+        },
+        ...prev.slice(0, 9) // Keep only 10 most recent alerts
+      ]);
+    };
+
+    // Also check localStorage for alerts on mount
+    const savedAlerts = localStorage.getItem('toweriq-alerts');
+    if (savedAlerts) {
+      const parsedAlerts = JSON.parse(savedAlerts);
+      if (parsedAlerts.length > 0) {
+        const formattedAlerts = parsedAlerts.map((alert: any) => ({
+          id: alert.id,
+          type: alert.type,
+          severity: alert.severity,
+          title: alert.type === 'collision' ? 'Collision Alert' : 'System Alert',
+          description: alert.message,
+          time: new Date(alert.timestamp).toLocaleTimeString(),
+          location: 'AI Prediction',
+          action: alert.message
+        }));
+        setAlerts(prev => [...formattedAlerts, ...prev].slice(0, 10));
+      }
+    }
+
+    window.addEventListener('newAlert', handleNewAlert as EventListener);
+    return () => window.removeEventListener('newAlert', handleNewAlert as EventListener);
+  }, []);
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
