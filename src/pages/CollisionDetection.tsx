@@ -42,28 +42,56 @@ const CollisionDetection = () => {
   const [prediction, setPrediction] = useState<PredictionResponse | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // Simple translation function (would use proper translation service in production)
+  // Enhanced translation function for Arabic to English
   const translateArabicToEnglish = async (text: string): Promise<string> => {
-    // This is a simplified translation - in production, use a proper translation API
+    if (!text || typeof text !== 'string') return text;
+    
     const translations: { [key: string]: string } = {
+      // Probability levels
       'منخفض': 'Low',
       'متوسط': 'Medium', 
       'عالي': 'High',
+      'عالية': 'High',
       'حرج': 'Critical',
-      'لا يوجد خطر': 'No risk',
+      'حرجة': 'Critical',
+      'خطر منخفض': 'Low Risk',
+      'خطر متوسط': 'Medium Risk',
+      'خطر عالي': 'High Risk',
+      'خطر حرج': 'Critical Risk',
+      
+      // Actions
+      'لا يوجد خطر': 'No Risk',
+      'لا توجد حاجة لإجراء': 'No Action Required',
       'مراقبة': 'Monitor',
-      'تغيير المسار': 'Change course',
-      'هبوط فوري': 'Immediate landing',
-      'إخلاء فوري': 'Immediate evacuation'
+      'مراقبة مستمرة': 'Continuous Monitoring',
+      'تغيير المسار': 'Change Course',
+      'تعديل المسار': 'Adjust Course',
+      'تغيير الارتفاع': 'Change Altitude',
+      'هبوط فوري': 'Immediate Landing',
+      'إخلاء فوري': 'Immediate Evacuation',
+      'اتصال فوري': 'Immediate Contact',
+      'تحذير': 'Warning',
+      'إنذار': 'Alert',
+      
+      // Common phrases
+      'احتمالية': 'Probability',
+      'التصادم': 'Collision',
+      'الطائرة': 'Aircraft',
+      'مطلوب': 'Required',
+      'ضروري': 'Necessary',
+      'فوري': 'Immediate'
     };
 
-    // Simple word replacement - in production use proper translation API
-    let translated = text;
+    let translated = text.trim();
+    
+    // Apply translations (case-insensitive)
     Object.entries(translations).forEach(([arabic, english]) => {
-      translated = translated.replace(new RegExp(arabic, 'g'), english);
+      const regex = new RegExp(arabic, 'gi');
+      translated = translated.replace(regex, english);
     });
 
-    return translated || text; // Return original if no translation found
+    // Clean up extra spaces and return
+    return translated.replace(/\s+/g, ' ').trim() || text;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
