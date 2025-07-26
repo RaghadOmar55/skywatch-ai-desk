@@ -42,69 +42,6 @@ const CollisionDetection = () => {
   const [prediction, setPrediction] = useState<PredictionResponse | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // Enhanced translation function for Arabic to English
-  const translateArabicToEnglish = async (text: string): Promise<string> => {
-    if (!text || typeof text !== 'string') return text;
-    
-    const translations: { [key: string]: string } = {
-      // Full phrases first (more specific)
-      'مراجعة فرق الارتفاع: الفرق قليل': 'Review altitude difference: Small difference',
-      'مراجعة فرق الارتفاع': 'Review altitude difference',
-      'الفرق قليل': 'Small difference',
-      'لا يوجد خطر': 'No Risk',
-      'لا توجد حاجة لإجراء': 'No Action Required',
-      'مراقبة مستمرة': 'Continuous Monitoring',
-      'تغيير المسار': 'Change Course',
-      'تعديل المسار': 'Adjust Course',
-      'تغيير الارتفاع': 'Change Altitude',
-      'هبوط فوري': 'Immediate Landing',
-      'إخلاء فوري': 'Immediate Evacuation',
-      'اتصال فوري': 'Immediate Contact',
-      'خطر منخفض': 'Low Risk',
-      'خطر متوسط': 'Medium Risk',
-      'خطر عالي': 'High Risk',
-      'خطر حرج': 'Critical Risk',
-      
-      // Individual words
-      'مراجعة': 'Review',
-      'فرق': 'difference',
-      'الارتفاع': 'altitude',
-      'قليل': 'small',
-      'كبير': 'large',
-      'منخفض': 'Low',
-      'متوسط': 'Medium', 
-      'عالي': 'High',
-      'عالية': 'High',
-      'حرج': 'Critical',
-      'حرجة': 'Critical',
-      'مراقبة': 'Monitor',
-      'تحذير': 'Warning',
-      'إنذار': 'Alert',
-      'احتمالية': 'Probability',
-      'التصادم': 'Collision',
-      'الطائرة': 'Aircraft',
-      'مطلوب': 'Required',
-      'ضروري': 'Necessary',
-      'فوري': 'Immediate',
-      'الفرق': 'The difference',
-      'المسافة': 'Distance',
-      'آمن': 'Safe',
-      'خطير': 'Dangerous'
-    };
-
-    let translated = text.trim();
-    
-    // Apply translations starting with longer phrases first
-    const sortedTranslations = Object.entries(translations).sort((a, b) => b[0].length - a[0].length);
-    
-    sortedTranslations.forEach(([arabic, english]) => {
-      const regex = new RegExp(arabic, 'gi');
-      translated = translated.replace(regex, english);
-    });
-
-    // Clean up extra spaces and return
-    return translated.replace(/\s+/g, ' ').trim() || text;
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -145,19 +82,10 @@ const CollisionDetection = () => {
 
       const data: PredictionResponse = JSON.parse(text);
       
-      // Translate Arabic responses to English
-      const translatedProbability = await translateArabicToEnglish(data.collision_probability);
-      const translatedAction = await translateArabicToEnglish(data.action_required);
-
-      const translatedPrediction = {
-        collision_probability: translatedProbability,
-        action_required: translatedAction
-      };
-
-      setPrediction(translatedPrediction);
+      setPrediction(data);
 
       // Send alert to main page alerts panel
-      const alertMessage = `Collision Alert: ${translatedProbability} probability. Action: ${translatedAction}`;
+      const alertMessage = `Collision Alert: ${data.collision_probability} probability. Action: ${data.action_required}`;
       
       // Use localStorage to communicate with main page (simple approach)
       const existingAlerts = JSON.parse(localStorage.getItem('toweriq-alerts') || '[]');
@@ -166,7 +94,7 @@ const CollisionDetection = () => {
         message: alertMessage,
         timestamp: new Date().toISOString(),
         type: 'collision',
-        severity: translatedProbability.toLowerCase().includes('high') || translatedProbability.toLowerCase().includes('critical') ? 'critical' : 'warning'
+        severity: data.collision_probability.toLowerCase().includes('high') || data.collision_probability.toLowerCase().includes('critical') ? 'critical' : 'warning'
       };
       
       existingAlerts.unshift(newAlert);
