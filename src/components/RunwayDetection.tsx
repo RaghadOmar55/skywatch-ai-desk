@@ -99,12 +99,15 @@ const RunwayDetection = () => {
                 className="hidden"
                 id="image-upload"
               />
-              <label htmlFor="image-upload">
-                <Button variant="outline" className="cursor-pointer">
-                  <Upload className="h-4 w-4 mr-2" />
-                  اختيار صورة
-                </Button>
-              </label>
+              <Button 
+                variant="outline" 
+                className="cursor-pointer"
+                onClick={() => document.getElementById('image-upload')?.click()}
+                type="button"
+              >
+                <Upload className="h-4 w-4 mr-2" />
+                اختيار صورة
+              </Button>
               <p className="text-xs text-muted-foreground mt-2">
                 الصيغ المدعومة: JPG, PNG, JPEG
               </p>
