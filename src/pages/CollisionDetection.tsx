@@ -22,19 +22,19 @@ interface PredictionResponse {
 
 const CollisionDetection = () => {
   const [aircraft1, setAircraft1] = useState<AircraftData>({
-    latitude: 0,
-    longitude: 0,
-    altitude: 0,
-    speed: 0,
-    heading: 0
+    latitude: 24.774265,
+    longitude: 46.738586,
+    altitude: 10000,
+    speed: 850,
+    heading: 90
   });
 
   const [aircraft2, setAircraft2] = useState<AircraftData>({
-    latitude: 0,
-    longitude: 0,
-    altitude: 0,
-    speed: 0,
-    heading: 0
+    latitude: 24.774265,
+    longitude: 46.838586,
+    altitude: 9800,
+    speed: 830,
+    heading: 270
   });
 
   const [prediction, setPrediction] = useState<PredictionResponse | null>(null);
@@ -164,54 +164,50 @@ const CollisionDetection = () => {
                       <Label htmlFor="a1-lat">Latitude</Label>
                       <Input
                         id="a1-lat"
-                        type="number"
-                        step="any"
-                        value={aircraft1.latitude}
+                        type="text"
+                        value={aircraft1.latitude.toString()}
                         onChange={(e) => updateAircraft1('latitude', parseFloat(e.target.value) || 0)}
-                        placeholder="e.g., 40.7128"
+                        placeholder="e.g., 24.774265"
                       />
                     </div>
                     <div>
                       <Label htmlFor="a1-lon">Longitude</Label>
                       <Input
                         id="a1-lon"
-                        type="number"
-                        step="any"
-                        value={aircraft1.longitude}
+                        type="text"
+                        value={aircraft1.longitude.toString()}
                         onChange={(e) => updateAircraft1('longitude', parseFloat(e.target.value) || 0)}
-                        placeholder="e.g., -74.0060"
+                        placeholder="e.g., 46.738586"
                       />
                     </div>
                     <div>
                       <Label htmlFor="a1-alt">Altitude (ft)</Label>
                       <Input
                         id="a1-alt"
-                        type="number"
-                        value={aircraft1.altitude}
+                        type="text"
+                        value={aircraft1.altitude.toString()}
                         onChange={(e) => updateAircraft1('altitude', parseFloat(e.target.value) || 0)}
-                        placeholder="e.g., 35000"
+                        placeholder="e.g., 10000"
                       />
                     </div>
                     <div>
                       <Label htmlFor="a1-speed">Speed (knots)</Label>
                       <Input
                         id="a1-speed"
-                        type="number"
-                        value={aircraft1.speed}
+                        type="text"
+                        value={aircraft1.speed.toString()}
                         onChange={(e) => updateAircraft1('speed', parseFloat(e.target.value) || 0)}
-                        placeholder="e.g., 450"
+                        placeholder="e.g., 850"
                       />
                     </div>
                     <div className="col-span-2">
                       <Label htmlFor="a1-heading">Heading (degrees)</Label>
                       <Input
                         id="a1-heading"
-                        type="number"
-                        min="0"
-                        max="359"
-                        value={aircraft1.heading}
+                        type="text"
+                        value={aircraft1.heading.toString()}
                         onChange={(e) => updateAircraft1('heading', parseFloat(e.target.value) || 0)}
-                        placeholder="e.g., 270"
+                        placeholder="e.g., 90"
                       />
                     </div>
                   </div>
@@ -228,54 +224,50 @@ const CollisionDetection = () => {
                       <Label htmlFor="a2-lat">Latitude</Label>
                       <Input
                         id="a2-lat"
-                        type="number"
-                        step="any"
-                        value={aircraft2.latitude}
+                        type="text"
+                        value={aircraft2.latitude.toString()}
                         onChange={(e) => updateAircraft2('latitude', parseFloat(e.target.value) || 0)}
-                        placeholder="e.g., 40.7580"
+                        placeholder="e.g., 24.774265"
                       />
                     </div>
                     <div>
                       <Label htmlFor="a2-lon">Longitude</Label>
                       <Input
                         id="a2-lon"
-                        type="number"
-                        step="any"
-                        value={aircraft2.longitude}
+                        type="text"
+                        value={aircraft2.longitude.toString()}
                         onChange={(e) => updateAircraft2('longitude', parseFloat(e.target.value) || 0)}
-                        placeholder="e.g., -73.9855"
+                        placeholder="e.g., 46.838586"
                       />
                     </div>
                     <div>
                       <Label htmlFor="a2-alt">Altitude (ft)</Label>
                       <Input
                         id="a2-alt"
-                        type="number"
-                        value={aircraft2.altitude}
+                        type="text"
+                        value={aircraft2.altitude.toString()}
                         onChange={(e) => updateAircraft2('altitude', parseFloat(e.target.value) || 0)}
-                        placeholder="e.g., 36000"
+                        placeholder="e.g., 9800"
                       />
                     </div>
                     <div>
                       <Label htmlFor="a2-speed">Speed (knots)</Label>
                       <Input
                         id="a2-speed"
-                        type="number"
-                        value={aircraft2.speed}
+                        type="text"
+                        value={aircraft2.speed.toString()}
                         onChange={(e) => updateAircraft2('speed', parseFloat(e.target.value) || 0)}
-                        placeholder="e.g., 420"
+                        placeholder="e.g., 830"
                       />
                     </div>
                     <div className="col-span-2">
                       <Label htmlFor="a2-heading">Heading (degrees)</Label>
                       <Input
                         id="a2-heading"
-                        type="number"
-                        min="0"
-                        max="359"
-                        value={aircraft2.heading}
+                        type="text"
+                        value={aircraft2.heading.toString()}
                         onChange={(e) => updateAircraft2('heading', parseFloat(e.target.value) || 0)}
-                        placeholder="e.g., 90"
+                        placeholder="e.g., 270"
                       />
                     </div>
                   </div>
