@@ -47,22 +47,12 @@ const CollisionDetection = () => {
     if (!text || typeof text !== 'string') return text;
     
     const translations: { [key: string]: string } = {
-      // Probability levels
-      'منخفض': 'Low',
-      'متوسط': 'Medium', 
-      'عالي': 'High',
-      'عالية': 'High',
-      'حرج': 'Critical',
-      'حرجة': 'Critical',
-      'خطر منخفض': 'Low Risk',
-      'خطر متوسط': 'Medium Risk',
-      'خطر عالي': 'High Risk',
-      'خطر حرج': 'Critical Risk',
-      
-      // Actions
+      // Full phrases first (more specific)
+      'مراجعة فرق الارتفاع: الفرق قليل': 'Review altitude difference: Small difference',
+      'مراجعة فرق الارتفاع': 'Review altitude difference',
+      'الفرق قليل': 'Small difference',
       'لا يوجد خطر': 'No Risk',
       'لا توجد حاجة لإجراء': 'No Action Required',
-      'مراقبة': 'Monitor',
       'مراقبة مستمرة': 'Continuous Monitoring',
       'تغيير المسار': 'Change Course',
       'تعديل المسار': 'Adjust Course',
@@ -70,22 +60,44 @@ const CollisionDetection = () => {
       'هبوط فوري': 'Immediate Landing',
       'إخلاء فوري': 'Immediate Evacuation',
       'اتصال فوري': 'Immediate Contact',
+      'خطر منخفض': 'Low Risk',
+      'خطر متوسط': 'Medium Risk',
+      'خطر عالي': 'High Risk',
+      'خطر حرج': 'Critical Risk',
+      
+      // Individual words
+      'مراجعة': 'Review',
+      'فرق': 'difference',
+      'الارتفاع': 'altitude',
+      'قليل': 'small',
+      'كبير': 'large',
+      'منخفض': 'Low',
+      'متوسط': 'Medium', 
+      'عالي': 'High',
+      'عالية': 'High',
+      'حرج': 'Critical',
+      'حرجة': 'Critical',
+      'مراقبة': 'Monitor',
       'تحذير': 'Warning',
       'إنذار': 'Alert',
-      
-      // Common phrases
       'احتمالية': 'Probability',
       'التصادم': 'Collision',
       'الطائرة': 'Aircraft',
       'مطلوب': 'Required',
       'ضروري': 'Necessary',
-      'فوري': 'Immediate'
+      'فوري': 'Immediate',
+      'الفرق': 'The difference',
+      'المسافة': 'Distance',
+      'آمن': 'Safe',
+      'خطير': 'Dangerous'
     };
 
     let translated = text.trim();
     
-    // Apply translations (case-insensitive)
-    Object.entries(translations).forEach(([arabic, english]) => {
+    // Apply translations starting with longer phrases first
+    const sortedTranslations = Object.entries(translations).sort((a, b) => b[0].length - a[0].length);
+    
+    sortedTranslations.forEach(([arabic, english]) => {
       const regex = new RegExp(arabic, 'gi');
       translated = translated.replace(regex, english);
     });
