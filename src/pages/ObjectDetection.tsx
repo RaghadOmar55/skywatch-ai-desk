@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Upload, Camera, Loader2, AlertCircle } from 'lucide-react';
+import { Upload, Camera, Loader2, AlertCircle, ArrowLeft } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { Link } from 'react-router-dom';
 
 const RunwayDetection = () => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -90,6 +91,16 @@ const RunwayDetection = () => {
 
   return (
     <div className="space-y-6">
+      {/* زر الرجوع للصفحة الرئيسية */}
+      <div className="flex justify-start">
+        <Link to="/">
+          <Button variant="outline" className="flex items-center gap-2">
+            <ArrowLeft className="h-4 w-4" />
+            العودة للصفحة الرئيسية
+          </Button>
+        </Link>
+      </div>
+      
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
