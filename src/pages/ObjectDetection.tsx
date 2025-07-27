@@ -33,8 +33,8 @@ const ObjectDetection = () => {
   const analyzeImage = async () => {
     if (!base64Image) {
       toast({
-        title: 'خطأ',
-        description: 'يرجى رفع صورة أولاً',
+        title: 'Error',
+        description: 'Please upload an image first',
         variant: 'destructive'
       });
       return;
@@ -64,26 +64,26 @@ const ObjectDetection = () => {
         const output = result.outputs[0];
         setDetectionResults(output);
         
-        // استخراج الصورة المعالجة
+        // Extract processed image
         if (output.output_image && output.output_image.value) {
           setResultImage(`data:image/jpeg;base64,${output.output_image.value}`);
         }
 
         toast({
-          title: 'تم التحليل بنجاح',
-          description: `تم اكتشاف ${output.count_objects || 0} عنصر في الصورة.`
+          title: 'Analysis Completed Successfully',
+          description: `Detected ${output.count_objects || 0} objects in the image.`
         });
       } else {
         toast({
-          title: 'لم يتم العثور على نتائج',
-          description: 'لم يتم الكشف عن عناصر في الصورة.'
+          title: 'No Results Found',
+          description: 'No objects detected in the image.'
         });
       }
     } catch (error) {
       console.error(error);
       toast({
-        title: 'خطأ في التحليل',
-        description: 'حدث خطأ أثناء الاتصال بـ Roboflow API',
+        title: 'Analysis Error',
+        description: 'Error connecting to Roboflow API',
         variant: 'destructive'
       });
     } finally {
