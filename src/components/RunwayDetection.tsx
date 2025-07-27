@@ -36,35 +36,42 @@ const RunwayDetection = () => {
 
     setLoading(true);
     try {
-      // Convert base64 to blob for API
-      const base64Data = selectedImage.split(',')[1];
-      
-      const response = await fetch('https://detect.roboflow.com/detect-count-and-visualize-2/2', {
+      const base64Data = selectedImage.split(',')[1]; // remove base64 header
+
+      const response = await fetch('https://serverless.roboflow.com/infer/workflows/toweriq/detect-count-and-visualize-2', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
+          'Content-Type': 'application/json',
         },
-        body: `api_key=rf_YOUR_API_KEY&image=${encodeURIComponent(base64Data)}`
+        body: JSON.stringify({
+          api_key: 'L8plo2CLs6yb5g3R0dDw', // مفتاحك الفعّال من Roboflow
+          inputs: {
+            image: {
+              type: 'base64',
+              value: base64Data
+            }
+          }
+        })
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
       const result = await response.json();
-      
-      if (result.visualization) {
-        setResultImage(`data:image/jpeg;base64,${result.visualization}`);
+      console.log('🔍 نتيجة Roboflow:', result);
+
+      const visualization = result?.results?.[0]?.visualizations?.[0]?.image;
+
+      if (visualization) {
+        setResultImage(visualization);
         setDetectionResults(result);
-        
+
         toast({
-          title: "تم التحليل بنجاح",
-          description: `تم اكتشاف ${result.predictions?.length || 0} عنصر في الصورة`,
+          title: "✅ تم التحليل",
+          description: `تمت معالجة الصورة وعرض النتائج بنجاح.`,
         });
+      } else {
+        throw new Error('لم يتم العثور على صورة معالجة');
       }
-      
     } catch (error) {
-      console.error('Error analyzing image:', error);
+      console.error('❌ خطأ في التحليل:', error);
       toast({
         title: "خطأ في التحليل",
         description: "حدث خطأ أثناء تحليل الصورة. يرجى المحاولة مرة أخرى.",
@@ -77,7 +84,7 @@ const RunwayDetection = () => {
 
   return (
     <div className="space-y-6">
-      {/* Upload Section */}
+      {/* رفع الصورة */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -101,7 +108,6 @@ const RunwayDetection = () => {
               />
               <Button 
                 variant="outline" 
-                className="cursor-pointer"
                 onClick={() => document.getElementById('image-upload')?.click()}
                 type="button"
               >
@@ -146,7 +152,7 @@ const RunwayDetection = () => {
         </CardContent>
       </Card>
 
-      {/* Results Section */}
+      {/* عرض النتائج */}
       {resultImage && (
         <Card>
           <CardHeader>
@@ -165,49 +171,18 @@ const RunwayDetection = () => {
                 />
               </div>
               
-              {detectionResults?.predictions && (
+              {detectionResults && (
                 <div className="bg-card/50 p-4 rounded-lg">
-                  <h4 className="font-semibold mb-2">تفاصيل الكشف:</h4>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
-                    <div>
-                      <span className="text-muted-foreground">العناصر المكتشفة:</span>
-                      <p className="font-medium">{detectionResults.predictions.length}</p>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">دقة النموذج:</span>
-                      <p className="font-medium">
-                        {detectionResults.predictions.length > 0 
-                          ? `${(detectionResults.predictions.reduce((acc: number, pred: any) => acc + pred.confidence, 0) / detectionResults.predictions.length * 100).toFixed(1)}%`
-                          : 'غير متوفر'
-                        }
-                      </p>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">وقت المعالجة:</span>
-                      <p className="font-medium">{detectionResults.time || 'غير متوفر'}</p>
-                    </div>
-                  </div>
+                  <h4 className="font-semibold mb-2">تفاصيل إضافية:</h4>
+                  <pre className="overflow-auto text-sm bg-muted p-4 rounded-md max-h-64 text-left">
+                    {JSON.stringify(detectionResults, null, 2)}
+                  </pre>
                 </div>
               )}
             </div>
           </CardContent>
         </Card>
       )}
-
-      {/* API Key Notice */}
-      <Card className="border-warning/50 bg-warning/5">
-        <CardContent className="pt-6">
-          <div className="flex items-start gap-3">
-            <AlertCircle className="h-5 w-5 text-warning mt-0.5" />
-            <div>
-              <h4 className="font-semibold text-warning mb-1">ملاحظة مهمة</h4>
-              <p className="text-sm text-muted-foreground">
-                يتطلب هذا المكون مفتاح API صالح من Roboflow. يرجى استبدال "rf_YOUR_API_KEY" بمفتاحك الحقيقي في الكود.
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 };
