@@ -136,7 +136,107 @@ const RunwayDetection = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <img src={resultImage} alt="Result" className="w-full max-w-xl mx-auto rounded-lg border" />
+            <div className="space-y-6">
+              {/* مقارنة الصور */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <h4 className="font-semibold text-center">الصورة الأصلية</h4>
+                  <div className="border-2 border-border rounded-lg p-2">
+                    <img 
+                      src={selectedImage} 
+                      alt="Original" 
+                      className="w-full h-auto rounded-lg"
+                    />
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <h4 className="font-semibold text-center">الصورة بعد التحليل</h4>
+                  <div className="border-2 border-primary rounded-lg p-2">
+                    <img 
+                      src={resultImage} 
+                      alt="Detection Result" 
+                      className="w-full h-auto rounded-lg"
+                    />
+                  </div>
+                  <p className="text-xs text-center text-muted-foreground">
+                    الصورة مع العلامات والكشوفات
+                  </p>
+                </div>
+              </div>
+              
+              {/* تفاصيل النتائج */}
+              {detectionResults && (
+                <div className="bg-card/50 p-4 rounded-lg border">
+                  <h4 className="font-semibold mb-3 flex items-center gap-2">
+                    <Camera className="h-4 w-4" />
+                    ملخص التحليل
+                  </h4>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div className="bg-background p-3 rounded border text-center">
+                      <p className="text-2xl font-bold text-primary">
+                        {detectionResults.predictions?.length || 0}
+                      </p>
+                      <p className="text-sm text-muted-foreground">عنصر مكتشف</p>
+                    </div>
+                    
+                    <div className="bg-background p-3 rounded border text-center">
+                      <p className="text-2xl font-bold text-success">
+                        {detectionResults.predictions?.length > 0 ? '✓' : '✗'}
+                      </p>
+                      <p className="text-sm text-muted-foreground">حالة الكشف</p>
+                    </div>
+                    
+                    <div className="bg-background p-3 rounded border text-center">
+                      <p className="text-2xl font-bold text-blue-600">
+                        {detectionResults.predictions?.length > 0 
+                          ? Math.max(...detectionResults.predictions.map((p: any) => p.confidence * 100)).toFixed(0) + '%'
+                          : '0%'
+                        }
+                      </p>
+                      <p className="text-sm text-muted-foreground">أعلى دقة</p>
+                    </div>
+                  </div>
+                  
+                  {detectionResults.predictions?.length > 0 && (
+                    <div className="space-y-3">
+                      <h5 className="font-medium border-b pb-2">تفاصيل العناصر المكتشفة:</h5>
+                      <div className="space-y-2 max-h-40 overflow-y-auto">
+                        {detectionResults.predictions.map((prediction: any, index: number) => (
+                          <div key={index} className="flex justify-between items-center bg-background p-3 rounded border">
+                            <div>
+                              <span className="font-medium text-primary">
+                                {prediction.class || `عنصر ${index + 1}`}
+                              </span>
+                              {prediction.confidence && (
+                                <span className="text-sm text-muted-foreground block">
+                                  دقة الكشف: {(prediction.confidence * 100).toFixed(1)}%
+                                </span>
+                              )}
+                            </div>
+                            <div className="text-right text-sm text-muted-foreground">
+                              {prediction.x && prediction.y && (
+                                <div>الموقع: ({Math.round(prediction.x)}, {Math.round(prediction.y)})</div>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  <details className="mt-4 border-t pt-3">
+                    <summary className="cursor-pointer font-medium text-muted-foreground hover:text-foreground">
+                      عرض البيانات التقنية الكاملة
+                    </summary>
+                    <pre className="overflow-auto text-xs bg-muted p-3 rounded-md max-h-48 text-left mt-3 border">
+                      {JSON.stringify(detectionResults, null, 2)}
+                    </pre>
+                  </details>
+                </div>
+              )}
+            </div>
           </CardContent>
         </Card>
       )}
