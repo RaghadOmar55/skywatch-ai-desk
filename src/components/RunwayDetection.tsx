@@ -6,6 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 
 const RunwayDetection = () => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [base64Image, setBase64Image] = useState<string | null>(null);
   const [resultImage, setResultImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [detectionResults, setDetectionResults] = useState<any>(null);
@@ -16,7 +17,9 @@ const RunwayDetection = () => {
     if (file) {
       const reader = new FileReader();
       reader.onload = (e) => {
+        const base64 = (e.target?.result as string)?.split(',')[1];
         setSelectedImage(e.target?.result as string);
+        setBase64Image(base64);
         setResultImage(null);
         setDetectionResults(null);
       };
@@ -25,57 +28,57 @@ const RunwayDetection = () => {
   };
 
   const analyzeImage = async () => {
-    if (!selectedImage) {
+    if (!base64Image) {
       toast({
-        title: "خطأ",
-        description: "يرجى تحديد صورة أولاً",
-        variant: "destructive"
+        title: 'خطأ',
+        description: 'يرجى رفع صورة أولاً',
+        variant: 'destructive'
       });
       return;
     }
 
     setLoading(true);
     try {
-      const base64Data = selectedImage.split(',')[1]; // remove base64 header
-
       const response = await fetch('https://serverless.roboflow.com/infer/workflows/toweriq/detect-count-and-visualize-2', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          api_key: 'L8plo2CLs6yb5g3R0dDw', // مفتاحك الفعّال من Roboflow
+          api_key: 'L8plo2CLs6yb5g3R0dDw',
           inputs: {
             image: {
               type: 'base64',
-              value: base64Data
+              value: base64Image
             }
           }
         })
       });
 
       const result = await response.json();
-      console.log('🔍 نتيجة Roboflow:', result);
 
-      const visualization = result?.results?.[0]?.visualizations?.[0]?.image;
-
-      if (visualization) {
-        setResultImage(visualization);
-        setDetectionResults(result);
+      if (result && result.results && result.results[0]?.predictions) {
+        setDetectionResults(result.results[0]);
+        if (result.results[0].visualizations?.length > 0) {
+          setResultImage(result.results[0].visualizations[0]);
+        }
 
         toast({
-          title: "✅ تم التحليل",
-          description: `تمت معالجة الصورة وعرض النتائج بنجاح.`,
+          title: 'تم التحليل بنجاح',
+          description: `تم اكتشاف ${result.results[0].predictions.length} عنصر في الصورة.`
         });
       } else {
-        throw new Error('لم يتم العثور على صورة معالجة');
+        toast({
+          title: 'لم يتم العثور على نتائج',
+          description: 'لم يتم الكشف عن عناصر في الصورة.'
+        });
       }
     } catch (error) {
-      console.error('❌ خطأ في التحليل:', error);
+      console.error(error);
       toast({
-        title: "خطأ في التحليل",
-        description: "حدث خطأ أثناء تحليل الصورة. يرجى المحاولة مرة أخرى.",
-        variant: "destructive"
+        title: 'خطأ في التحليل',
+        description: 'حدث خطأ أثناء الاتصال بـ Roboflow API',
+        variant: 'destructive'
       });
     } finally {
       setLoading(false);
@@ -84,21 +87,18 @@ const RunwayDetection = () => {
 
   return (
     <div className="space-y-6">
-      {/* رفع الصورة */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Camera className="h-5 w-5 text-primary" />
-            تحليل مدرجات الطائرات
+            تحليل مدرج الطائرات
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             <div className="border-2 border-dashed border-border rounded-lg p-8 text-center">
               <Upload className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-              <p className="text-muted-foreground mb-4">
-                اختر صورة مدرج الطائرة للتحليل
-              </p>
+              <p className="text-muted-foreground mb-4">اختر صورة مدرج للتحليل</p>
               <input
                 type="file"
                 accept="image/*"
@@ -106,44 +106,19 @@ const RunwayDetection = () => {
                 className="hidden"
                 id="image-upload"
               />
-              <Button 
-                variant="outline" 
-                onClick={() => document.getElementById('image-upload')?.click()}
-                type="button"
-              >
-                <Upload className="h-4 w-4 mr-2" />
-                اختيار صورة
+              <Button variant="outline" onClick={() => document.getElementById('image-upload')?.click()}>
+                <Upload className="h-4 w-4 mr-2" />اختيار صورة
               </Button>
-              <p className="text-xs text-muted-foreground mt-2">
-                الصيغ المدعومة: JPG, PNG, JPEG
-              </p>
             </div>
 
             {selectedImage && (
               <div className="space-y-4">
-                <div className="text-center">
-                  <img 
-                    src={selectedImage} 
-                    alt="Selected" 
-                    className="max-w-full h-auto max-h-64 mx-auto rounded-lg border"
-                  />
-                </div>
-                
-                <Button 
-                  onClick={analyzeImage} 
-                  disabled={loading}
-                  className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
-                >
+                <img src={selectedImage} alt="Selected" className="w-full max-w-xl mx-auto rounded-lg border" />
+                <Button onClick={analyzeImage} disabled={loading} className="w-full">
                   {loading ? (
-                    <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      جاري التحليل...
-                    </>
+                    <><Loader2 className="h-4 w-4 mr-2 animate-spin" />جاري التحليل...</>
                   ) : (
-                    <>
-                      <Camera className="h-4 w-4 mr-2" />
-                      تحليل الصورة
-                    </>
+                    <><Camera className="h-4 w-4 mr-2" />تحليل الصورة</>
                   )}
                 </Button>
               </div>
@@ -152,7 +127,6 @@ const RunwayDetection = () => {
         </CardContent>
       </Card>
 
-      {/* عرض النتائج */}
       {resultImage && (
         <Card>
           <CardHeader>
@@ -162,24 +136,7 @@ const RunwayDetection = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              <div className="text-center">
-                <img 
-                  src={resultImage} 
-                  alt="Detection Results" 
-                  className="max-w-full h-auto mx-auto rounded-lg border"
-                />
-              </div>
-              
-              {detectionResults && (
-                <div className="bg-card/50 p-4 rounded-lg">
-                  <h4 className="font-semibold mb-2">تفاصيل إضافية:</h4>
-                  <pre className="overflow-auto text-sm bg-muted p-4 rounded-md max-h-64 text-left">
-                    {JSON.stringify(detectionResults, null, 2)}
-                  </pre>
-                </div>
-              )}
-            </div>
+            <img src={resultImage} alt="Result" className="w-full max-w-xl mx-auto rounded-lg border" />
           </CardContent>
         </Card>
       )}
