@@ -73,6 +73,16 @@ const ObjectDetection = () => {
           title: 'Analysis Completed Successfully',
           description: `Detected ${output.count_objects || 0} objects in the image.`
         });
+
+        // Save to localStorage and emit event for main page
+        const detectionData = {
+          objectCount: output.count_objects || 0,
+          lastUpdated: new Date().toISOString(),
+          status: 'completed',
+          hasWarnings: (output.count_objects || 0) > 5
+        };
+        localStorage.setItem('objectDetectionData', JSON.stringify(detectionData));
+        window.dispatchEvent(new CustomEvent('objectDetectionUpdate', { detail: detectionData }));
       } else {
         toast({
           title: 'No Results Found',
