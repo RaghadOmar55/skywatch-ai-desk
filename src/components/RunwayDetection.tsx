@@ -136,7 +136,54 @@ const RunwayDetection = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <img src={resultImage} alt="Result" className="w-full max-w-xl mx-auto rounded-lg border" />
+            <div className="space-y-4">
+              <div className="text-center">
+                <img src={resultImage} alt="Result" className="w-full max-w-xl mx-auto rounded-lg border" />
+              </div>
+              
+              {detectionResults && (
+                <div className="bg-card/50 p-4 rounded-lg">
+                  <h4 className="font-semibold mb-2">تفاصيل النتائج:</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div className="bg-background p-3 rounded border">
+                      <p className="text-sm font-medium text-muted-foreground">عدد العناصر المكتشفة</p>
+                      <p className="text-lg font-bold text-primary">
+                        {detectionResults.predictions?.length || 0}
+                      </p>
+                    </div>
+                    <div className="bg-background p-3 rounded border">
+                      <p className="text-sm font-medium text-muted-foreground">دقة الكشف</p>
+                      <p className="text-lg font-bold text-success">
+                        {detectionResults.predictions?.length > 0 ? 'مرتفعة' : 'منخفضة'}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  {detectionResults.predictions?.length > 0 && (
+                    <div className="space-y-2">
+                      <h5 className="font-medium">العناصر المكتشفة:</h5>
+                      {detectionResults.predictions.map((prediction: any, index: number) => (
+                        <div key={index} className="bg-background p-2 rounded border text-sm">
+                          <span className="font-medium">{prediction.class || 'غير محدد'}</span>
+                          {prediction.confidence && (
+                            <span className="text-muted-foreground ml-2">
+                              (الثقة: {(prediction.confidence * 100).toFixed(1)}%)
+                            </span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  
+                  <details className="mt-4">
+                    <summary className="cursor-pointer font-medium">عرض البيانات الكاملة</summary>
+                    <pre className="overflow-auto text-sm bg-muted p-4 rounded-md max-h-64 text-left mt-2">
+                      {JSON.stringify(detectionResults, null, 2)}
+                    </pre>
+                  </details>
+                </div>
+              )}
+            </div>
           </CardContent>
         </Card>
       )}
