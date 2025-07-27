@@ -105,7 +105,7 @@ const ObjectDetection = () => {
               className="flex items-center gap-2"
             >
               <ArrowLeft className="h-4 w-4" />
-              العودة للصفحة الرئيسية
+              Back to Home
             </Button>
             <h2 className="text-2xl font-bold">Object Detection Model</h2>
             <div></div>
@@ -117,14 +117,14 @@ const ObjectDetection = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Camera className="h-5 w-5 text-primary" />
-                تحليل مدرج الطائرات
+                Runway Analysis
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div className="border-2 border-dashed border-border rounded-lg p-8 text-center">
                   <Upload className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                  <p className="text-muted-foreground mb-4">اختر صورة مدرج للتحليل</p>
+                  <p className="text-muted-foreground mb-4">Select a runway image for analysis</p>
                   <input
                     type="file"
                     accept="image/*"
@@ -133,7 +133,7 @@ const ObjectDetection = () => {
                     id="image-upload"
                   />
                   <Button variant="outline" onClick={() => document.getElementById('image-upload')?.click()}>
-                    <Upload className="h-4 w-4 mr-2" />اختيار صورة
+                    <Upload className="h-4 w-4 mr-2" />Select Image
                   </Button>
                 </div>
 
@@ -142,9 +142,9 @@ const ObjectDetection = () => {
                     <img src={selectedImage} alt="Selected" className="w-full max-w-xl mx-auto rounded-lg border" />
                     <Button onClick={analyzeImage} disabled={loading} className="w-full">
                       {loading ? (
-                        <><Loader2 className="h-4 w-4 mr-2 animate-spin" />جاري التحليل...</>
+                        <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Analyzing...</>
                       ) : (
-                        <><Camera className="h-4 w-4 mr-2" />تحليل الصورة</>
+                        <><Camera className="h-4 w-4 mr-2" />Analyze Image</>
                       )}
                     </Button>
                   </div>
@@ -158,15 +158,15 @@ const ObjectDetection = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <AlertCircle className="h-5 w-5 text-success" />
-                  نتائج التحليل
+                  Analysis Results
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-6">
-                  {/* مقارنة الصور */}
+                  {/* Image comparison */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <h4 className="font-semibold text-center">الصورة الأصلية</h4>
+                      <h4 className="font-semibold text-center">Original Image</h4>
                       <div className="border-2 border-border rounded-lg p-2">
                         <img 
                           src={selectedImage} 
@@ -177,7 +177,7 @@ const ObjectDetection = () => {
                     </div>
                     
                     <div className="space-y-2">
-                      <h4 className="font-semibold text-center">الصورة بعد التحليل</h4>
+                      <h4 className="font-semibold text-center">Image After Analysis</h4>
                       <div className="border-2 border-primary rounded-lg p-2">
                         <img 
                           src={resultImage} 
@@ -186,17 +186,17 @@ const ObjectDetection = () => {
                         />
                       </div>
                       <p className="text-xs text-center text-muted-foreground">
-                        الصورة مع العلامات والكشوفات
+                        Image with annotations and detections
                       </p>
                     </div>
                   </div>
                   
-                  {/* تفاصيل النتائج */}
+                  {/* Results details */}
                   {detectionResults && (
                     <div className="bg-card/50 p-4 rounded-lg border">
                       <h4 className="font-semibold mb-3 flex items-center gap-2">
                         <Camera className="h-4 w-4" />
-                        ملخص التحليل
+                        Analysis Summary
                       </h4>
                       
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
@@ -204,33 +204,33 @@ const ObjectDetection = () => {
                           <p className="text-2xl font-bold text-primary">
                             {detectionResults.count_objects || 0}
                           </p>
-                          <p className="text-sm text-muted-foreground">عنصر مكتشف</p>
+                          <p className="text-sm text-muted-foreground">Objects Detected</p>
                         </div>
                         
                         <div className="bg-background p-3 rounded border text-center">
                           <p className="text-2xl font-bold text-success">
                             {detectionResults.count_objects > 0 ? '✓' : '✗'}
                           </p>
-                          <p className="text-sm text-muted-foreground">حالة الكشف</p>
+                          <p className="text-sm text-muted-foreground">Detection Status</p>
                         </div>
                         
                         <div className="bg-background p-3 rounded border text-center">
                           <p className="text-2xl font-bold text-blue-600">
                             {detectionResults.output_image ? '100%' : '0%'}
                           </p>
-                          <p className="text-sm text-muted-foreground">حالة المعالجة</p>
+                          <p className="text-sm text-muted-foreground">Processing Status</p>
                         </div>
                       </div>
                       
                       {detectionResults.count_objects > 0 && (
                         <div className="space-y-3">
-                          <h5 className="font-medium border-b pb-2">معلومات إضافية:</h5>
+                          <h5 className="font-medium border-b pb-2">Additional Information:</h5>
                           <div className="bg-background p-3 rounded border">
                             <p className="text-sm">
-                              تم تحليل الصورة بنجاح وتم اكتشاف <span className="font-bold text-primary">{detectionResults.count_objects}</span> عنصر.
+                              Image analyzed successfully and detected <span className="font-bold text-primary">{detectionResults.count_objects}</span> objects.
                             </p>
                             <p className="text-sm text-muted-foreground mt-2">
-                              تم وضع العلامات والتعليقات على الصورة المعالجة.
+                              Annotations and labels have been added to the processed image.
                             </p>
                           </div>
                         </div>
@@ -238,7 +238,7 @@ const ObjectDetection = () => {
                       
                       <details className="mt-4 border-t pt-3">
                         <summary className="cursor-pointer font-medium text-muted-foreground hover:text-foreground">
-                          عرض البيانات التقنية الكاملة
+                          Show Complete Technical Data
                         </summary>
                         <pre className="overflow-auto text-xs bg-muted p-3 rounded-md max-h-48 text-left mt-3 border">
                           {JSON.stringify(detectionResults, null, 2)}
