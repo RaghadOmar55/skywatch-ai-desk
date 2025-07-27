@@ -25,7 +25,8 @@ export const AlertsPanel = () => {
     status: 'idle',
     hasWarnings: false,
     lastUpdated: new Date(),
-    hasBeenUsed: false // Only show when model has been actively used
+    hasBeenUsed: false,
+    analysisResults: null as any // Store full analysis results
   });
   const [alerts, setAlerts] = useState<Alert[]>([
     {
@@ -73,29 +74,30 @@ export const AlertsPanel = () => {
   // Listen for object detection updates
   useEffect(() => {
     const handleObjectDetectionUpdate = (event: CustomEvent) => {
-      const { count, status, hasWarnings } = event.detail;
+      const { count, status, hasWarnings, analysisResults } = event.detail;
       const newData = {
         objectCount: count || 0,
         status: status || 'completed',
         hasWarnings: hasWarnings || false,
         lastUpdated: new Date(),
-        hasBeenUsed: true // Mark as used when receiving active updates
+        hasBeenUsed: true,
+        analysisResults: analysisResults || null
       };
       setObjectDetectionData(newData);
       
-      // Create alert for object detection warnings
-      if (hasWarnings && count > 0) {
-        const objectAlert = {
+      // Create detailed alert for analysis results
+      if (count > 0) {
+        const resultAlert = {
           id: Date.now() + 1000,
           type: 'object_detection',
-          severity: 'warning',
-          title: 'Object Detection Alert',
-          description: `${count} objects detected requiring review`,
+          severity: hasWarnings ? 'warning' : 'medium',
+          title: 'Object Detection Complete',
+          description: `Analysis finished: ${count} objects detected in runway image`,
           time: 'Just now',
-          location: 'Camera Analysis',
-          action: 'Review detected objects in Object Detection page'
+          location: 'Runway Analysis',
+          action: hasWarnings ? 'Review detected objects - high count detected' : 'Analysis completed successfully'
         };
-        setAlerts(prev => [objectAlert, ...prev.slice(0, 9)]);
+        setAlerts(prev => [resultAlert, ...prev.slice(0, 9)]);
       }
     };
 
@@ -220,13 +222,13 @@ export const AlertsPanel = () => {
         </div>
       </CardHeader>
       <CardContent className="space-y-3 p-4 max-h-[400px] overflow-auto">
-        {/* Object Detection Status Section - Only show if model has been used */}
+        {/* Object Detection Results Section - Only show if model has been used */}
         {objectDetectionData.hasBeenUsed && objectDetectionData.objectCount > 0 && (
-          <div className="p-3 rounded-lg border bg-primary/5 border-primary/20 mb-4">
+          <div className="p-4 rounded-lg border bg-primary/5 border-primary/20 mb-4">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <Camera className="h-4 w-4 text-primary" />
-                <h4 className="font-medium text-sm text-primary">Object Detection Status</h4>
+                <h4 className="font-medium text-sm text-primary">Object Detection Results</h4>
               </div>
               <Button
                 variant="outline"
@@ -235,32 +237,45 @@ export const AlertsPanel = () => {
                 className="h-6 text-xs px-2 py-1 flex items-center gap-1"
               >
                 <Link className="h-3 w-3" />
-                Open
+                View Details
               </Button>
             </div>
             
-            <div className="grid grid-cols-2 gap-3 mb-3">
-              <div className="text-center">
+            {/* Analysis Summary */}
+            <div className="grid grid-cols-3 gap-3 mb-3">
+              <div className="text-center bg-background/50 p-2 rounded border">
                 <p className="text-lg font-bold text-primary">{objectDetectionData.objectCount}</p>
-                <p className="text-xs text-muted-foreground">Objects Detected</p>
+                <p className="text-xs text-muted-foreground">Objects</p>
               </div>
-              <div className="text-center">
+              <div className="text-center bg-background/50 p-2 rounded border">
                 <p className="text-lg font-bold text-green-600">
                   {objectDetectionData.status === 'completed' ? '✓' : '○'}
                 </p>
                 <p className="text-xs text-muted-foreground">Status</p>
               </div>
+              <div className="text-center bg-background/50 p-2 rounded border">
+                <p className="text-lg font-bold text-blue-600">100%</p>
+                <p className="text-xs text-muted-foreground">Processed</p>
+              </div>
+            </div>
+
+            {/* Analysis Details */}
+            <div className="bg-background/30 rounded p-3 border border-border/50 mb-3">
+              <p className="text-xs font-medium text-foreground mb-1">Analysis Summary:</p>
+              <p className="text-xs text-muted-foreground">
+                Runway image analyzed successfully. Detected {objectDetectionData.objectCount} objects with annotations and labels applied to processed image.
+              </p>
             </div>
 
             <div className="text-xs text-muted-foreground flex items-center gap-1 mb-2">
               <Clock className="h-3 w-3" />
-              Last updated: {objectDetectionData.lastUpdated.toLocaleTimeString()}
+              Completed: {objectDetectionData.lastUpdated.toLocaleTimeString()}
             </div>
 
             {objectDetectionData.hasWarnings && (
               <div className="bg-warning/10 border border-warning/20 rounded p-2">
                 <p className="text-xs font-medium text-warning">
-                  ⚠️ Objects detected requiring review
+                  ⚠️ High object count detected - review recommended
                 </p>
               </div>
             )}
