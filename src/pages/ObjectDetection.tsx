@@ -57,15 +57,18 @@ const RunwayDetection = () => {
 
       const result = await response.json();
 
-      if (result && result.results && result.results[0]?.predictions) {
-        setDetectionResults(result.results[0]);
-        if (result.results[0].visualizations?.length > 0) {
-          setResultImage(result.results[0].visualizations[0]);
+      if (result && result.outputs && result.outputs[0]) {
+        const output = result.outputs[0];
+        setDetectionResults(output);
+        
+        // استخراج الصورة المعالجة
+        if (output.output_image && output.output_image.value) {
+          setResultImage(`data:image/jpeg;base64,${output.output_image.value}`);
         }
 
         toast({
           title: 'تم التحليل بنجاح',
-          description: `تم اكتشاف ${result.results[0].predictions.length} عنصر في الصورة.`
+          description: `تم اكتشاف ${output.count_objects || 0} عنصر في الصورة.`
         });
       } else {
         toast({
@@ -176,52 +179,36 @@ const RunwayDetection = () => {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                     <div className="bg-background p-3 rounded border text-center">
                       <p className="text-2xl font-bold text-primary">
-                        {detectionResults.predictions?.length || 0}
+                        {detectionResults.count_objects || 0}
                       </p>
                       <p className="text-sm text-muted-foreground">عنصر مكتشف</p>
                     </div>
                     
                     <div className="bg-background p-3 rounded border text-center">
                       <p className="text-2xl font-bold text-success">
-                        {detectionResults.predictions?.length > 0 ? '✓' : '✗'}
+                        {detectionResults.count_objects > 0 ? '✓' : '✗'}
                       </p>
                       <p className="text-sm text-muted-foreground">حالة الكشف</p>
                     </div>
                     
                     <div className="bg-background p-3 rounded border text-center">
                       <p className="text-2xl font-bold text-blue-600">
-                        {detectionResults.predictions?.length > 0 
-                          ? Math.max(...detectionResults.predictions.map((p: any) => p.confidence * 100)).toFixed(0) + '%'
-                          : '0%'
-                        }
+                        {detectionResults.output_image ? '100%' : '0%'}
                       </p>
-                      <p className="text-sm text-muted-foreground">أعلى دقة</p>
+                      <p className="text-sm text-muted-foreground">حالة المعالجة</p>
                     </div>
                   </div>
                   
-                  {detectionResults.predictions?.length > 0 && (
+                  {detectionResults.count_objects > 0 && (
                     <div className="space-y-3">
-                      <h5 className="font-medium border-b pb-2">تفاصيل العناصر المكتشفة:</h5>
-                      <div className="space-y-2 max-h-40 overflow-y-auto">
-                        {detectionResults.predictions.map((prediction: any, index: number) => (
-                          <div key={index} className="flex justify-between items-center bg-background p-3 rounded border">
-                            <div>
-                              <span className="font-medium text-primary">
-                                {prediction.class || `عنصر ${index + 1}`}
-                              </span>
-                              {prediction.confidence && (
-                                <span className="text-sm text-muted-foreground block">
-                                  دقة الكشف: {(prediction.confidence * 100).toFixed(1)}%
-                                </span>
-                              )}
-                            </div>
-                            <div className="text-right text-sm text-muted-foreground">
-                              {prediction.x && prediction.y && (
-                                <div>الموقع: ({Math.round(prediction.x)}, {Math.round(prediction.y)})</div>
-                              )}
-                            </div>
-                          </div>
-                        ))}
+                      <h5 className="font-medium border-b pb-2">معلومات إضافية:</h5>
+                      <div className="bg-background p-3 rounded border">
+                        <p className="text-sm">
+                          تم تحليل الصورة بنجاح وتم اكتشاف <span className="font-bold text-primary">{detectionResults.count_objects}</span> عنصر.
+                        </p>
+                        <p className="text-sm text-muted-foreground mt-2">
+                          تم وضع العلامات والتعليقات على الصورة المعالجة.
+                        </p>
                       </div>
                     </div>
                   )}
