@@ -24,7 +24,8 @@ export const AlertsPanel = () => {
     objectCount: 0,
     status: 'idle',
     hasWarnings: false,
-    lastUpdated: new Date()
+    lastUpdated: new Date(),
+    hasBeenUsed: false // Only show when model has been actively used
   });
   const [alerts, setAlerts] = useState<Alert[]>([
     {
@@ -77,7 +78,8 @@ export const AlertsPanel = () => {
         objectCount: count || 0,
         status: status || 'completed',
         hasWarnings: hasWarnings || false,
-        lastUpdated: new Date()
+        lastUpdated: new Date(),
+        hasBeenUsed: true // Mark as used when receiving active updates
       };
       setObjectDetectionData(newData);
       
@@ -99,14 +101,17 @@ export const AlertsPanel = () => {
 
     window.addEventListener('objectDetectionUpdate', handleObjectDetectionUpdate as EventListener);
     
-    // Load saved object detection data
+    // Load saved object detection data only if it shows the model was actually used
     const savedObjectData = localStorage.getItem('objectDetectionData');
     if (savedObjectData) {
       const parsed = JSON.parse(savedObjectData);
-      setObjectDetectionData({
-        ...parsed,
-        lastUpdated: new Date(parsed.lastUpdated)
-      });
+      // Only restore if the model was previously used (not just default data)
+      if (parsed.hasBeenUsed) {
+        setObjectDetectionData({
+          ...parsed,
+          lastUpdated: new Date(parsed.lastUpdated)
+        });
+      }
     }
 
     return () => {
@@ -215,8 +220,8 @@ export const AlertsPanel = () => {
         </div>
       </CardHeader>
       <CardContent className="space-y-3 p-4 max-h-[400px] overflow-auto">
-        {/* Object Detection Status Section */}
-        {objectDetectionData.objectCount > 0 && (
+        {/* Object Detection Status Section - Only show if model has been used */}
+        {objectDetectionData.hasBeenUsed && objectDetectionData.objectCount > 0 && (
           <div className="p-3 rounded-lg border bg-primary/5 border-primary/20 mb-4">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
