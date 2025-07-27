@@ -1,8 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { AlertTriangle, X, Clock, MapPin } from 'lucide-react';
+import { AlertTriangle, X, Clock, MapPin, Camera, Link } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface Alert {
   id: number;
@@ -18,6 +19,13 @@ interface Alert {
 }
 
 export const AlertsPanel = () => {
+  const navigate = useNavigate();
+  const [objectDetectionData, setObjectDetectionData] = useState({
+    objectCount: 0,
+    status: 'idle',
+    hasWarnings: false,
+    lastUpdated: new Date()
+  });
   const [alerts, setAlerts] = useState<Alert[]>([
     {
       id: 1,
@@ -60,6 +68,51 @@ export const AlertsPanel = () => {
       action: 'Maintain visual separation'
     }
   ]);
+
+  // Listen for object detection updates
+  useEffect(() => {
+    const handleObjectDetectionUpdate = (event: CustomEvent) => {
+      const { count, status, hasWarnings } = event.detail;
+      const newData = {
+        objectCount: count || 0,
+        status: status || 'completed',
+        hasWarnings: hasWarnings || false,
+        lastUpdated: new Date()
+      };
+      setObjectDetectionData(newData);
+      
+      // Create alert for object detection warnings
+      if (hasWarnings && count > 0) {
+        const objectAlert = {
+          id: Date.now() + 1000,
+          type: 'object_detection',
+          severity: 'warning',
+          title: 'Object Detection Alert',
+          description: `${count} objects detected requiring review`,
+          time: 'Just now',
+          location: 'Camera Analysis',
+          action: 'Review detected objects in Object Detection page'
+        };
+        setAlerts(prev => [objectAlert, ...prev.slice(0, 9)]);
+      }
+    };
+
+    window.addEventListener('objectDetectionUpdate', handleObjectDetectionUpdate as EventListener);
+    
+    // Load saved object detection data
+    const savedObjectData = localStorage.getItem('objectDetectionData');
+    if (savedObjectData) {
+      const parsed = JSON.parse(savedObjectData);
+      setObjectDetectionData({
+        ...parsed,
+        lastUpdated: new Date(parsed.lastUpdated)
+      });
+    }
+
+    return () => {
+      window.removeEventListener('objectDetectionUpdate', handleObjectDetectionUpdate as EventListener);
+    };
+  }, []);
 
   // Listen for new alerts from other pages
   useEffect(() => {
@@ -138,6 +191,7 @@ export const AlertsPanel = () => {
       case 'collision': return <AlertTriangle className="h-4 w-4" />;
       case 'route': return <MapPin className="h-4 w-4" />;
       case 'weather': return <AlertTriangle className="h-4 w-4" />;
+      case 'object_detection': return <Camera className="h-4 w-4" />;
       default: return <AlertTriangle className="h-4 w-4" />;
     }
   };
@@ -161,6 +215,52 @@ export const AlertsPanel = () => {
         </div>
       </CardHeader>
       <CardContent className="space-y-3 p-4 max-h-[400px] overflow-auto">
+        {/* Object Detection Status Section */}
+        {objectDetectionData.objectCount > 0 && (
+          <div className="p-3 rounded-lg border bg-primary/5 border-primary/20 mb-4">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <Camera className="h-4 w-4 text-primary" />
+                <h4 className="font-medium text-sm text-primary">Object Detection Status</h4>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate('/object')}
+                className="h-6 text-xs px-2 py-1 flex items-center gap-1"
+              >
+                <Link className="h-3 w-3" />
+                Open
+              </Button>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-3 mb-3">
+              <div className="text-center">
+                <p className="text-lg font-bold text-primary">{objectDetectionData.objectCount}</p>
+                <p className="text-xs text-muted-foreground">Objects Detected</p>
+              </div>
+              <div className="text-center">
+                <p className="text-lg font-bold text-green-600">
+                  {objectDetectionData.status === 'completed' ? '✓' : '○'}
+                </p>
+                <p className="text-xs text-muted-foreground">Status</p>
+              </div>
+            </div>
+
+            <div className="text-xs text-muted-foreground flex items-center gap-1 mb-2">
+              <Clock className="h-3 w-3" />
+              Last updated: {objectDetectionData.lastUpdated.toLocaleTimeString()}
+            </div>
+
+            {objectDetectionData.hasWarnings && (
+              <div className="bg-warning/10 border border-warning/20 rounded p-2">
+                <p className="text-xs font-medium text-warning">
+                  ⚠️ Objects detected requiring review
+                </p>
+              </div>
+            )}
+          </div>
+        )}
         {alerts.map((alert) => (
           <div
             key={alert.id}

@@ -11,7 +11,7 @@ import { AlertsPanel } from '@/components/AlertsPanel';
 import { MetricsPanel } from '@/components/MetricsPanel';
 import { AirspaceMap } from '@/components/AirspaceMap';
 import { Header } from '@/components/Header';
-import { ObjectDetectionStatus } from '@/components/ObjectDetectionStatus';
+
 
 const Index = () => {
   const [aiAssistantEnabled, setAiAssistantEnabled] = useState(true);
@@ -159,10 +159,6 @@ const Index = () => {
                 <MetricsPanel />
               </div>
 
-              {/* Object Detection Status */}
-              <div className="col-span-12 lg:col-span-7">
-                <ObjectDetectionStatus />
-              </div>
             </div>
           </div>
         </div>
